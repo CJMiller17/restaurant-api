@@ -11,4 +11,14 @@ print('SCRIPT START *************************')
 ### NOTE
 # DO NOT CHANGE CODE ABOVE THIS LINE
 # WORK BELOW
+from Food_Items.models import *
 
+# CREATE 
+
+Customer.objects.create(
+    first_name = "",
+    last_name = "",
+    username = "",
+    password = "",
+    
+)
