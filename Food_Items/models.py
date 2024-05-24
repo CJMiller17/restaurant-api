@@ -1,22 +1,24 @@
 from django.db import models
 # Create your models here.
 
+# A lot is blank=True and null=True because there was a 400 error originally on the front end
 class Customer(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=50)
     username = models.CharField(max_length=45, blank = True)
     password= models.CharField(max_length=50, blank = True)
-    email = models.EmailField(blank = True, null=True) # Interesting bug that blank emails are not unique and only one can be set to blank
+    email = models.EmailField(blank = True, null=True)          # Interesting bug that blank emails are not unique and only one can be set to blank
     address = models.CharField(max_length=100, blank = True)
     city = models.CharField(max_length=70, blank = True) 
     state = models.CharField(max_length=2, blank = True)
     zipcode = models.CharField(max_length=5, blank = True)
-    phone = models.CharField(max_length=10, unique=True)
+    phone = models.CharField(max_length=10, unique=True)        # Unique so a customer can be looked up later
     created_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
+# Not truly used because it is never updated
 STATUS = (
     ("Received", "Received"),
     ("Being Made", "Being Made"),
@@ -27,6 +29,7 @@ STATUS = (
     ("Cancelled", "Cancelled")
 )
 
+# Filtered to populate Menu
 CATEGORY = (
     ("Starters", "Starters"),
     ("Breakfast", "Breakfast"),
@@ -36,6 +39,7 @@ CATEGORY = (
     ("Desserts", "Desserts")
 )
 
+# Not used at all
 SPICINESS = (
     ("Not Applicable", "Not Applicable"),
     ("Mild", "Mild"),
@@ -55,7 +59,7 @@ class Driver(models.Model):
     
 class FoodItem(models.Model):
     name = models.CharField(max_length=60)
-    category = models.CharField(max_length=20, choices=CATEGORY, null=True)
+    category = models.CharField(max_length=20, choices=CATEGORY, null=True)  # This is how you get a drop down of choices
     desc = models.CharField(max_length=500)
     price = models.CharField(max_length=6, null=True)
     qty = models.SmallIntegerField()
@@ -63,6 +67,7 @@ class FoodItem(models.Model):
     def __str__(self):
         return f"{self.name} {self.price}"
 
+# Order needs customers built first. Acts as a 'blank sheet' for order details
 class Order(models.Model):
     name = models.ForeignKey(Customer, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS, blank=True, null=True)
@@ -70,8 +75,8 @@ class Order(models.Model):
     special_instructions = models.TextField(max_length=1000, blank=True, null=True)
     time_placed = models.DateTimeField(auto_now_add=True)
     driver_id = models.ForeignKey(Driver, on_delete=models.SET_NULL, null=True, verbose_name="Driver", blank=True)
-    food_items = models.ManyToManyField(FoodItem, through="Order_Details")
-
+    food_items = models.ManyToManyField(FoodItem, through="Order_Details") # This is on the models and is why this item on the Serializer has a different method.
+                                                # The through's functionality is replaced or hidden by the Serializers. It no longer does anything unique
     def __str__(self):
         return f"{self.name.first_name} {self.name.last_name} {self.time_placed}"
 
@@ -93,7 +98,7 @@ class Review(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
     likes = models.PositiveSmallIntegerField()
-    shares = models.PositiveSmallIntegerField()
+    shares = models.PositiveSmallIntegerField() # Act as constraints for accepting information, but doesn't prevent the attempt
 
     def __str__(self):
         return f"{self.customer.first_name}"

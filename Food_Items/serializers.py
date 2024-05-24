@@ -27,23 +27,24 @@ class Order_DetailsSerializer(serializers.ModelSerializer):
         model = Order_Details
         fields = ["id", "food_id", "food_name", "order_id", "qty", "tag", "spiciness", "special_instructions"]
 
-
+#########################################################################  
 class OrderSerializer(serializers.ModelSerializer):
-    customer_name = serializers.ReadOnlyField(source="name.first_name")
-    driver_name = serializers.ReadOnlyField(source='driver_id.name')
-    food_items = Order_DetailsSerializer(many=True, read_only=True)
-    
+    customer_name = serializers.ReadOnlyField(source="name.first_name")     # Displays the customer name at the orders end point
+    driver_name = serializers.ReadOnlyField(source='driver_id.name')        # Displays the driver   name at the orders end point
+    food_items = Order_DetailsSerializer(many=True, read_only=True)         # Serializes (turns Python object into JSON data? Otherwise is would be just an JSON object rather than spelled out) the food items. Essenentially nests it
+                                                                                
     class Meta:
         model = Order
         fields = ["id", 'name', 'driver_id', "customer_name", "status", "delivery", "special_instructions", "time_placed", "driver_name", "food_items"]
-
+######################################################################### 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    customer_name = serializers.SerializerMethodField()
+    customer_name = serializers.SerializerMethodField() # Blows my mind that this can relate to a string in the fields sections. It allows you to add/customize  attributes that aren't directly part of the model
 
-    def get_customer_name(self, obj):
+    def get_customer_name(self, obj): # self is serializer and obj is the model
         return f"{obj.customer.first_name} {obj.customer.last_name}"
     
     class Meta:
         model = Review
-        fields = ["id", "customer_name", "created_date", "content", "likes", "shares"]
+        fields = ["id", "customer_id", "customer_name", "created_date", "content", "likes", "shares"]
+# I am pretty sure this doesn't work because there is no way to connect a customer to it currently
