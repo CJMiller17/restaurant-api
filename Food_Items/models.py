@@ -61,15 +61,15 @@ class FoodItem(models.Model):
     qty = models.SmallIntegerField()
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.name} {self.price}"
 
 class Order(models.Model):
     name = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    status = models.CharField(max_length=20, choices=STATUS)
-    delivery = models.BooleanField(default=False)
-    special_instructions = models.TextField(max_length=1000, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS, blank=True, null=True)
+    delivery = models.BooleanField(default=False, blank=True, null=True)
+    special_instructions = models.TextField(max_length=1000, blank=True, null=True)
     time_placed = models.DateTimeField(auto_now_add=True)
-    driver_id = models.ForeignKey(Driver, on_delete=models.SET_NULL, null=True, verbose_name="Driver")
+    driver_id = models.ForeignKey(Driver, on_delete=models.SET_NULL, null=True, verbose_name="Driver", blank=True)
     food_items = models.ManyToManyField(FoodItem, through="Order_Details")
 
     def __str__(self):
